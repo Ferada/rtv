@@ -19,42 +19,16 @@ from .__version__ import __version__
 
 __all__ = []
 
-def load_config():
-    """
-    Search for a configuration file at the location ~/.rtv and attempt to load
-    saved settings for things like the username and password.
-    """
+# Set the local for full unicode support
+locale.setlocale(locale.LC_ALL, '')
 
-    config = configparser.ConfigParser()
+# Squelch SSL warnings for Ubuntu
+logging.captureWarnings(True)
 
-    HOME = os.path.expanduser('~')
-    XDG_CONFIG_HOME = os.getenv('XDG_CONFIG_HOME', os.path.join(HOME, '.config'))
-    config_paths = [
-        os.path.join(XDG_CONFIG_HOME, 'rtv', 'rtv.cfg'),
-        os.path.join(HOME, '.rtv')
-    ]
-
-    # read only the first existing config file
-    for config_path in config_paths:
-        if os.path.exists(config_path):
-            config.read(config_path)
-            break
-
-    defaults = {}
-    if config.has_section('rtv'):
-        defaults = dict(config.items('rtv'))
-
-    if 'ascii' in defaults:
-        defaults['ascii'] = config.getboolean('rtv', 'ascii')
-
-    return defaults
-
-
-def command_line():
+def parse_command_line():
 
     parser = argparse.ArgumentParser(
-        prog='rtv', description=SUMMARY,
-        epilog=CONTROLS + HELP,
+        prog='rtv', description=SUMMARY, epilog=CONTROLS+HELP,
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('-s', dest='subreddit', help='subreddit name')
@@ -63,31 +37,36 @@ def command_line():
                         help='enable ascii-only mode')
     parser.add_argument('--log', metavar='FILE', action='store',
                         help='Log HTTP requests')
+    parser.add_argument('--config', metavar='FILE', action='store',
+                        help='Location of config file')
 
     group = parser.add_argument_group('authentication (optional)', AUTH)
     group.add_argument('-u', dest='username', help='reddit username')
     group.add_argument('-p', dest='password', help='reddit password')
 
     args = parser.parse_args()
-
+    # TODO: do something to convert args to a standard sdict
     return args
-
 
 def main():
     "Main entry point"
 
-    # logging.basicConfig(level=logging.DEBUG, filename='rtv.log')
-    locale.setlocale(locale.LC_ALL, '')
+    args = parse_command_line()
+    config.load(**args)
+    import flask
 
-    args = command_line()
-    local_config = load_config()
 
-    # set the terminal title
+
+    # Set the terminal title
     title = 'rtv {0}'.format(__version__)
     if os.name == 'nt':
         os.system('title {0}'.format(title))
     else:
         sys.stdout.write("\x1b]2;{0}\x07".format(title))
+
+
+
+
 
     # Fill in empty arguments with config file values. Paramaters explicitly
     # typed on the command line will take priority over config file params.
@@ -97,8 +76,7 @@ def main():
 
     config.unicode = (not args.ascii)
 
-    # Squelch SSL warnings for Ubuntu
-    logging.captureWarnings(True)
+
     if args.log:
         logging.basicConfig(level=logging.DEBUG, filename=args.log)
 
