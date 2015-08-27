@@ -5,7 +5,7 @@ import curses
 from curses import textpad, ascii
 from contextlib import contextmanager
 
-from . import config
+from .config import config
 from .docs import HELP
 from .helpers import strip_textpad, clean
 from .exceptions import EscapeInterrupt
@@ -27,7 +27,7 @@ def get_gold():
     Return the guilded symbol.
     """
 
-    symbol = u'\u272A' if config.unicode else '*'
+    symbol = '*' if config['ascii'] else u'\u272A'
     attr = curses.A_BOLD | Color.YELLOW
     return symbol, attr
 
@@ -38,13 +38,13 @@ def get_arrow(likes):
     """
 
     if likes is None:
-        symbol = u'\u2022' if config.unicode else 'o'
+        symbol = 'o' if config['ascii'] else u'\u2022'
         attr = curses.A_BOLD
     elif likes:
-        symbol = u'\u25b2' if config.unicode else '^'
+        symbol = '^' if config['ascii'] else u'\u25b2'
         attr = curses.A_BOLD | Color.GREEN
     else:
-        symbol = u'\u25bc' if config.unicode else 'v'
+        symbol = 'v' if config['ascii'] else u'\u25bc'
         attr = curses.A_BOLD | Color.RED
     return symbol, attr
 

@@ -16,9 +16,10 @@ from .curses_helpers import (Color, LoadScreen, add_line, get_arrow, get_gold,
                              show_notification, prompt_input)
 
 __all__ = ['history', 'SubredditController', 'SubredditPage']
-_logger = logging.getLogger(__name__)
-history = load_history()
 
+_logger = logging.getLogger(__name__)
+
+history = load_history()
 
 @atexit.register
 def save_links():

@@ -1,7 +1,9 @@
 from .__version__ import __version__
 
 __all__ = ['AGENT', 'SUMMARY', 'AUTH', 'CONTROLS', 'HELP', 'COMMENT_FILE',
-           'SUBMISSION_FILE', 'COMMENT_EDIT_FILE']
+           'SUBMISSION_FILE', 'COMMENT_EDIT_FILE', 'TITLE']
+
+TITLE = "rtv {}".format(__version__)
 
 AGENT = """\
 desktop:https://github.com/michael-lazar/rtv:{} (by /u/civilization_phaze_3)\

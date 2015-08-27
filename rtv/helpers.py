@@ -15,7 +15,7 @@ from kitchen.text.display import wrap, textual_width_chop
 import six
 from six.moves import input
 
-from . import config
+from .config import config
 from .exceptions import ProgramError
 
 __all__ = ['open_browser', 'clean', 'wrap_text', 'strip_textpad',
@@ -44,7 +44,7 @@ def clean(string, n_cols=None):
     if n_cols is not None and n_cols <= 0:
         return ''
 
-    if not config.unicode:
+    if config['ascii']:
         if six.PY3 or isinstance(string, unicode):
             string = string.encode('ascii', 'replace')
         return string[:n_cols] if n_cols else string
@@ -95,7 +95,7 @@ def open_url(url):
         url = url[:-4] + 'webm'
 
     # Check if the URL matches a custom command from the config file
-    for prog, command in config.url_map.items():
+    for prog, command in config['url_map'].items():
         if prog.match(url):
             cmd = command['command'] % url
             if command['background']:
